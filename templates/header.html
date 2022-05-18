@@ -1,0 +1,16 @@
+<header>
+    <h3>Studybud</h3>
+    <nav>
+        <ul>
+            {% if request.user.is_authenticated %}
+                <p>Hello {{request.user}}</p>
+                <li><a href="{% url 'logout' %}">Logout</a></li>
+            {% else %}
+                <li><a href="{% url 'login' %}">Login</a></li>
+            {% endif %}
+        </ul>
+    </nav>
+    <form action="{% url 'home' %}">
+        <input type="text" name="q" placeholder="Search...">
+    </form>
+</header>

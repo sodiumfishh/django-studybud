@@ -21,52 +21,18 @@
 
     <div class="main">
         <div class="sidebar">
-            <h3>Browse Topics</h3>
-            {% if topics %}
-            <ul>
-                <li><a href="{% url 'home' %}">All</a></li>
-                {% for topic in topics %}
-                <li><a href="{% url 'home' %}?q={{topic.name}}">{{topic.name}}</a></li>
-                {% endfor %}
-            </ul>
-            {% endif %}
+            {% include 'base/topics_component.html' %}
         </div>
         <div>
             <h3>{{room_count}} room{{room_count|pluralize}} available</h3>
             <a href="{% url 'create-room' %}">Create Room</a>
+            
             {% if rooms %}
-            {% for room in rooms %}
-                <div>
-                    <h4><span>@{{room.host}}</span></h4>
-                    {% if request.user == room.host %}
-                    <div>
-                        <a href="{% url 'update-room' room.id %}" class="room-actions">Edit</a>
-                        <a href="{% url 'delete-room' room.id %}" class="room-actions">Delete</a>
-                    </div>
-                    {% endif %}
-                    <h3><a href="{% url 'room' room.id %}">{{room.name}}</a></h3>
-                    <hr>
-                </div>
-            {% endfor %}
+            {% include 'base/feed_component.html' %}
             {% endif %}
         </div>
         <div class="activity">
-            <h3>Recent Activity</h3>
-            <hr />
-            <div>
-                {% if room_messages %}
-                    {% for message in room_messages %}
-                        <div>
-                            <small>@{{message.user}} {{message.created|timesince}} ago</small>
-                            <small>replied to "{{message.room}}"</small>
-
-                            <p>{{message}}</p>
-                        </div>
-                    {% endfor %}
-                {% else %}
-                    <p>No activities to show</p>
-                {% endif %}
-            </div>
+            {% include 'base/activity_component.html' %}
         </div>
     </div>
 

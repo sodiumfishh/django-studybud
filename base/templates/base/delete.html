@@ -4,6 +4,7 @@
 
 <form action="" method="post">
     {% csrf_token %}
+    <input type="hidden" name="next" value="{{request.GET.next}}">
     <p>Are you sure you want to delete "{{obj}}"?</p>
     <a href="{{request.META.HTTP_REFERER }}">Go Back</a>
     <button type="submit">Confirm</button>

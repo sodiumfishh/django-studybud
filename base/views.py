@@ -9,11 +9,13 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Room, Topic, Message
 from .forms import CreateRoom
 
+
+
 def loginPage(request):
 
     page = 'login'
 
-    nextURL = request.GET.get('next')
+    nextURL = request.GET.get('next') if request.GET.get('next') is not None else 'home'
 
     if request.user.is_authenticated:
         return redirect('home')
@@ -101,6 +103,14 @@ def room(request, pk):
     
     return render(request, 'base/room.html', context)
 
+def userProfile(request, pk):
+    user = User.objects.get(id=pk)
+    rooms = user.room_set.all()
+    room_messages = user.message_set.all()
+    topics = Topic.objects.all()
+    context = {'user':user, 'rooms':rooms, 'room_messages': room_messages, 'topics': topics}
+    return render(request, 'base/profile.html', context)
+
 @login_required(login_url='login')
 def createRoom(request):
     form = CreateRoom()
@@ -156,6 +166,6 @@ def deleteMessage(request, pk):
 
     if request.method == 'POST':
         message.delete()
-        return redirect('room', pk=message.room.id)
+        return redirect(request.POST['next'])
     
     return render(request, 'base/delete.html', {'obj':message})

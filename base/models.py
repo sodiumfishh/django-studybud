@@ -33,4 +33,4 @@ class Message(models.Model):
         ordering = ['-updated', '-created']
 
     def __str__(self):
-        return self.body[0:50]
+        return self.body[0:50] # limits message from getting too long

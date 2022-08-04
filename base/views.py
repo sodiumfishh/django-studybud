@@ -7,7 +7,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from .models import Room, Topic, Message
-from .forms import CreateRoom
+from .forms import RoomForm
 
 
 
@@ -113,36 +113,45 @@ def userProfile(request, pk):
 
 @login_required(login_url='login')
 def createRoom(request):
-    form = CreateRoom()
+    form = RoomForm()
 
     if request.method == 'POST':
-        form = CreateRoom(request.POST)
+        topic_name = request.POST.get('topic')
+        topic, created = Topic.objects.get_or_create(name=topic_name)
 
-        if form.is_valid():
-            form.save()
-            return redirect('home')
+        Room.objects.create(
+            host=request.user,
+            topic=topic,
+            name=request.POST.get('name'),
+            description=request.POST.get('description')
+        )
+        return redirect('home')
 
-    context = {'form':form}
+    topics = Topic.objects.all()
+    context = {'form':form, 'title_text':'Create', 'topics':topics}
 
-    return render(request, 'base/create.html', context)
+    return render(request, 'base/room_form.html', context)
 
 @login_required(login_url='login')
 def updateRoom(request, pk):
     room = Room.objects.get(id=pk)
-    form = CreateRoom(instance=room)
+    form = RoomForm(instance=room)
 
     if request.user != room.host:
         return HttpResponse('You are not allowed here')
 
     if request.method == 'POST':
-        form = CreateRoom(request.POST, instance=room)
+        topic_name = request.POST.get('topic')
+        topic, created = Topic.objects.get_or_create(name=topic_name)
+        room.name = request.POST.get('name')
+        room.topic = topic
+        room.description = request.POST.get('description')
+        room.save()
+        return redirect('home')
 
-        if form.is_valid():
-            form.save()
-            return redirect('home')
-
-    context = {'form':form}
-    return render(request, 'base/update.html', context)
+    topics = Topic.objects.all()
+    context = {'form':form, 'title_text':'Update', 'topics':topics, 'room':room}
+    return render(request, 'base/room_form.html', context)
 
 @login_required(login_url='login')
 def deleteRoom(request, pk):

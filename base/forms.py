@@ -1,7 +1,8 @@
 from django.forms import ModelForm
 from .models import Room
 
-class CreateRoom(ModelForm):
+class RoomForm(ModelForm):
     class Meta:
         model = Room
-        fields = "__all__"
+        # fields = "__all__" // for rendering all fields
+        exclude = ['host', 'participants']
